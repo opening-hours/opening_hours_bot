@@ -22,8 +22,8 @@ class OpeningHoursBot: # {{{
     # }}}
 
     # rule set {{{
-    def _fix_time_error_1(self, wrong_val):
-        """ "0930-0630" -> "09:30-06:30" """
+    def _fix_ruleset_1_time_error(self, wrong_val):
+        """ '0930-0630' -> '09:30-06:30' """
         regex = re.compile(r'\A(?P<start_hour>[0-1][0-9]|2[0-4])(?P<start_min>[:1-5][0-9]|0[0-9])\s*(?P<sep>-)\s*(?P<end_hour>[0-1][0-9]|2[0-4])(?P<end_min>[:1-5][0-9]|0[0-9])\Z')
 
         re_object = re.search(regex, wrong_val)
@@ -35,7 +35,17 @@ class OpeningHoursBot: # {{{
                 re_object.group('end_hour'), re_object.group('end_min')
                 )
 
-    fixing_functions = [ _fix_time_error_1 ]
+    def _fix_ruleset_2(self, wrong_val):
+        """Changes: 'nach vereinbarung' -> '"nach Vereinbarung"' (most often used value for this).
+        """
+        regex = re.compile(r'\A(?P<start_word>(?:Termin|nur) |)nach vereinbarung\Z', flags=re.IGNORECASE)
+
+        re_object = re.search(regex, wrong_val)
+        if re_object == None:
+            return wrong_val
+        return '"%snach Vereinbarung"' % (re_object.group('start_word') if re_object.group('start_word') else '')
+
+    fixing_functions = [ _fix_ruleset_1_time_error, _fix_ruleset_2 ]
     # }}}
 
     # helper functions {{{
@@ -72,11 +82,11 @@ class OpeningHoursBot: # {{{
                     break
             if value != correct_value:
                 if self._is_opening_hours_ok(correct_value) == True:
-                    logging.debug(u'Fixed value "%s" -> "%s"' % (value, correct_value))
+                    logging.debug(u'Fixed value \'%s\' -> \'%s\'' % (value, correct_value))
                     tag.set('v', correct_value)
                     return True
                 else:
-                    logging.critical('OpeningHoursBot did generate a wrong opening_hours value ("%s" -> "%s")' % (value, correct_value))
+                    logging.critical('OpeningHoursBot did generate a wrong opening_hours value (\'%s\' -> \'%s\')' % (value, correct_value))
         return False
 
     def _for_object(self, node):
