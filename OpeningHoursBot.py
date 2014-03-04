@@ -71,11 +71,13 @@ class OpeningHoursBot: # {{{
                 if value != correct_value:
                     break
             if value != correct_value:
-                logging.debug(u'Fixed value "%s" -> "%s"' % (value, correct_value))
-                tag.set('v', correct_value)
-                return True
+                if self._is_opening_hours_ok(correct_value) == True:
+                    logging.debug(u'Fixed value "%s" -> "%s"' % (value, correct_value))
+                    tag.set('v', correct_value)
+                    return True
+                else:
+                    logging.critical('OpeningHoursBot did generate a wrong opening_hours value ("%s" -> "%s")' % (value, correct_value))
         return False
-
 
     def _for_object(self, node):
         """Called for each object (node, way)."""
