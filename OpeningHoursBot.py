@@ -24,12 +24,13 @@ class OpeningHoursBot: # {{{
     # rule set {{{
     def _fix_ruleset_1_time_error(self, wrong_val):
         """ '0930-0630' -> '09:30-06:30' """
-        regex = re.compile(r'\A(?P<start_hour>[0-1][0-9]|2[0-4])(?P<start_min>[:1-5][0-9]|0[0-9])\s*(?P<sep>-)\s*(?P<end_hour>[0-1][0-9]|2[0-4])(?P<end_min>[:1-5][0-9]|0[0-9])\Z')
+        regex = re.compile(r'\A(?P<day_list>(?:(?:Mo|Tu|We|Th|Fr|Sa|Su)-?){2}\s*|)(?P<start_hour>[0-1][0-9]|2[0-4])(?P<start_min>[:1-5][0-9]|0[0-9])\s*(?P<sep>-)\s*(?P<end_hour>[0-1][0-9]|2[0-4])(?P<end_min>[:1-5][0-9]|0[0-9])\Z')
 
         re_object = re.search(regex, wrong_val)
         if re_object == None:
             return wrong_val
-        return '%s:%s%s%s:%s' % (
+        return '%s%s:%s%s%s:%s' % (
+                re_object.group('day_list'),
                 re_object.group('start_hour'), re_object.group('start_min'),
                 re_object.group('sep'),
                 re_object.group('end_hour'), re_object.group('end_min')
@@ -59,6 +60,8 @@ class OpeningHoursBot: # {{{
             error = True
 
         if not error and not oh.getWarnings():
+            if value != oh.prettifyValue():
+                logging.error('OpeningHoursBot did generate an opening_hours value (\'%s\') which does not match the prettified value.' % (value))
             return True
         elif error:
             return False
