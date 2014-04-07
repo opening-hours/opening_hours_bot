@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 # Helper script to fix common mistakes in opening_hours like values in OSM automatically.
+# For discussion see: http://permalink.gmane.org/gmane.comp.gis.openstreetmap.tagging/16810
 
 # modules {{{
 import logging, sys, re
@@ -21,9 +22,14 @@ class OpeningHoursBot: # {{{
             self._for_object(way)
     # }}}
 
-    # rule set {{{
+    # rule sets {{{
     def _fix_ruleset_1_time_error(self, wrong_val):
-        """ '0930-0630' -> '09:30-06:30' """
+        """ '0930-0630' -> '09:30-06:30'
+
+        Use with caution. Does conflict with goal b) (as defined here: http://permalink.gmane.org/gmane.comp.gis.openstreetmap.tagging/16810)
+
+        Should not be enabled because the time could be specified in 12 hours format or in 24 hours format (which is the recommended format: http://wiki.openstreetmap.org/wiki/Key:opening_hours:specification).
+        """
         regex = re.compile(r'\A(?P<day_list>(?:(?:Mo|Tu|We|Th|Fr|Sa|Su)-?){2}\s*|)(?P<start_hour>[0-1][0-9]|2[0-4])(?P<start_min>[:1-5][0-9]|0[0-9])\s*(?P<sep>-)\s*(?P<end_hour>[0-1][0-9]|2[0-4])(?P<end_min>[:1-5][0-9]|0[0-9])\Z')
 
         re_object = re.search(regex, wrong_val)
@@ -46,7 +52,7 @@ class OpeningHoursBot: # {{{
             return wrong_val
         return '"%snach Vereinbarung"' % (re_object.group('start_word') if re_object.group('start_word') else '')
 
-    fixing_functions = [ _fix_ruleset_1_time_error, _fix_ruleset_2 ]
+    fixing_functions = [ _fix_ruleset_2 ]
     # }}}
 
     # helper functions {{{
@@ -74,7 +80,7 @@ class OpeningHoursBot: # {{{
         """Fix value of the tag with functions in fixing_functions list.
 
         :param tag: XML tag node.
-        :returns: Boolean if fixing was successful.
+        :returns: Boolean which is True if fixing was successful.
         """
         value = tag.attrib['v']
         if self._is_opening_hours_ok(value) == False:
