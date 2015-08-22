@@ -11,14 +11,14 @@ This repository keeps track of scripts I use to speed up the Quality Assurance p
 
 Just clone the repository with
 
-```
+```Shell
 git clone --recursive https://github.com/ypid/opening_hours_bot.git
 ```
 
 and install it’s dependencies (execute inside the repository):
-```
+```Shell
 cd pyopening_hours/ && npm install
 ```
 
 ## Usage
-The script OpeningHoursBot.py can be called with an [.osm (from JOSM)](https://wiki.openstreetmap.org/wiki/JOSM_file_format) file as parameter and will write a corrected "$basename-fixed.osm" file.
+The script `OpeningHoursBot.py` can be called with an [.osm (from JOSM)](https://wiki.openstreetmap.org/wiki/JOSM_file_format) file as parameter and will write a corrected `$basename-fixed.osm` file.
