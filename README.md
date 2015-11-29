@@ -5,7 +5,7 @@ This repository keeps track of scripts I use to speed up the Quality Assurance p
 [pyopening\_hours]: https://github.com/ypid/pyopening_hours
 
 [key:opening\_hours]: http://wiki.openstreetmap.org/wiki/Key:opening_hours
-[oh-lib]: https://github.com/ypid/opening_hours.js
+[oh-lib]: https://github.com/opening-hours/opening_hours.js
 
 ## Install
 
